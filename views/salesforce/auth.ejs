@@ -1,0 +1,21 @@
+
+<h3>Auth</h3>
+
+<form action="/salesforce/auth" method="POST">
+  <button type="submit" class="btn btn-success">Submit</button>
+</form>
+
+<div class="row m-t-md">
+  <div class="col-sm-12">
+    <% if (data.error) { %>
+      <label>API call Failed</label>
+      <pre class="bg-danger"><code><%= data.error %></code></pre>
+    <% } %>
+
+    <% if (data.result) { %>
+      <label>API call succeeded</label>
+      <pre class="bg-success"><code><%= data.result %></code></pre>
+    <% } %>
+  </div>
+</div>
+
