@@ -55,6 +55,51 @@ router.post('/auth', function(req, res, next) {
 });
 
 
+router.get('/account/query', function(req, res, next) {
+  res.render('salesforce/account/query', {
+    title: 'Query Accounts',
+    data: { params: {} }
+  });
+});
+
+router.post('/account/query', function(req, res, next) {
+  const params = req.body;
+  const payload =  {
+    title: 'Query Account',
+    data: { params: params }
+  };
+
+  let conn = null;
+
+  Promise.resolve().then(function() {
+    return loginAsync().then(function(connection, result) {
+      conn = connection;
+    });
+
+  }).then(function() {
+    return new Promise(function(resolve, reject) {
+      // See: https://jsforce.github.io/document/#using-soql
+      conn.query("SELECT Id, Name FROM Account", function(err, result) {
+        if (err) {
+          console.error(result);
+          reject(err);
+
+        } else {
+          payload.data.result = JSON.stringify(result, null, 2);
+          resolve();
+        }
+      });
+    });
+
+  }).catch(function(err) {
+    console.error(err);
+    payload.data.error = err;
+
+  }).finally(function() {
+    res.render('salesforce/account/query', payload);
+  });
+});
+
 router.get('/account/create', function(req, res, next) {
   res.render('salesforce/account/create', {
     title: 'Create Account',
