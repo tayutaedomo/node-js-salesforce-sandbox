@@ -18,7 +18,14 @@ router.get('/ipify', function(req, res, next) {
     data: {}
   };
 
-  request('http://api.ipify.org', function (error, response, body) {
+
+  const options = {
+    url: 'http://api.ipify.org',
+  };
+
+  if (process.env.PROXY_URL) options.proxy = process.env.PROXY_URL;
+
+  request(options, function (error, response, body) {
     if (error) {
       console.error('error:', error);
       payload.data.error = error;

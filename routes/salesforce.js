@@ -27,29 +27,19 @@ router.get('/auth', function(req, res, next) {
 router.post('/auth', function(req, res, next) {
   // See: https://qiita.com/na0AaooQ/items/5c088a68ae43a1e74c6a
 
-  const conn = new jsforce.Connection({
-    oauth2: {
-      loginUrl:     OAUTH_LOGIN_URL,
-      clientId:     OAUTH_CONSUMER_KEY,
-      clientSecret: OAUTH_CONSUMER_SECRET
-    }
-  });
+  const payload =  {
+    title: 'Auth',
+    data: {}
+  };
 
-  conn.login(OAUTH_CLIENT_USERNAME, OAUTH_CLIENT_PASSWORD, function(err, result) {
-    const payload =  {
-      title: 'Auth',
-      data: {}
-    };
+  loginAsync().then(function(result) {
+    payload.data.result = JSON.stringify(result.result, null, 2);
 
-    if (err) {
-      console.error(err);
-      payload.data.error = err;
+  }).catch(function(err) {
+    console.error(err);
+    payload.data.error = err;
 
-    } else {
-      console.log(result);
-      payload.data.result = JSON.stringify(result, null, 2);
-    }
-
+  }).finally(function() {
     res.render('salesforce/auth', payload);
   });
 });
@@ -72,8 +62,8 @@ router.post('/account/query', function(req, res, next) {
   let conn = null;
 
   Promise.resolve().then(function() {
-    return loginAsync().then(function(connection, result) {
-      conn = connection;
+    return loginAsync().then(function(result) {
+      conn = result.conn;
     });
 
   }).then(function() {
@@ -119,8 +109,8 @@ router.post('/account/create', function(req, res, next) {
   let conn = null;
 
   Promise.resolve().then(function() {
-    return loginAsync().then(function(connection, result) {
-      conn = connection;
+    return loginAsync().then(function(result) {
+      conn = result.conn;
     });
 
   }).then(function() {
@@ -153,18 +143,24 @@ router.post('/account/create', function(req, res, next) {
 
 
 function loginAsync() {
-  const conn = new jsforce.Connection({
+  const options = {
     oauth2: {
       loginUrl:     OAUTH_LOGIN_URL,
       clientId:     OAUTH_CONSUMER_KEY,
       clientSecret: OAUTH_CONSUMER_SECRET
     }
-  });
+  };
+
+  if (process.env.PROXY_URL) options.proxyUrl = process.env.PROXY_URL;
+
+  const conn = new jsforce.Connection(options);
 
   return new Promise(function(resolve, reject) {
     conn.login(OAUTH_CLIENT_USERNAME, OAUTH_CLIENT_PASSWORD, function(err, result) {
+      debug(result);
+
       if (err) reject(err);
-      else resolve(conn, result);
+      else resolve({ conn, result });
     });
   });
 }
