@@ -6,11 +6,16 @@ const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const basicAuth = require('basic-auth-connect');
 
 const indexRouter = require('./routes/index');
 const salesforceRouter = require('./routes/salesforce');
 
 const app = express();
+
+const basicUsername = process.env.BASIC_USERNAME || 'username';
+const basicPassword = process.env.BASIC_PASSWORD || 'password';
+app.use(basicAuth(basicUsername, basicPassword));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
