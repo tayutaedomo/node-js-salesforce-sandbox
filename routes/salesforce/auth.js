@@ -3,19 +3,18 @@
 const debug = require('debug')('node-js-salesforce-sandbox:routes:salesforce:auth');
 const express = require('express');
 const router = express.Router();
-const Promise = require('bluebird');
 
 const auth = require('../../lib/salesforce');
 
 
-router.get('/auth', function(req, res, next) {
+router.get('/', function(req, res, next) {
   res.render('salesforce/auth', {
     title: 'Auth',
     data: {}
   });
 });
 
-router.post('/auth', function(req, res, next) {
+router.post('/', function(req, res, next) {
   //
   // See: https://qiita.com/na0AaooQ/items/5c088a68ae43a1e74c6a
   //

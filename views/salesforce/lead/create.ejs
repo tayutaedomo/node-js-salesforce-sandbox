@@ -1,0 +1,43 @@
+
+<h4>Create Contact</h4>
+
+<div class="row">
+  <div class="col-sm-12">
+    <form action="/salesforce/lead/create" method="POST">
+      <div class="form-group">
+        <label>LastName:</label>
+        <input type="text" name="lastName" style="width: 400px;"
+               value="<%if (data.params.lastName) { %><%= data.params.lastName %><% } %>">
+      </div>
+
+      <div class="form-group">
+        <label>Company:</label>
+        <input type="text" name="company" style="width: 400px;"
+               value="<%if (data.params.company) { %><%= data.params.company %><% } %>">
+      </div>
+
+      <div class="form-group">
+        <label>Email:</label>
+        <input type="email" name="email" style="width: 400px;"
+               value="<%if (data.params.email) { %><%= data.params.email %><% } %>">
+      </div>
+
+      <button type="submit" class="btn btn-success">Create</button>
+    </form>
+  </div>
+</div>
+
+<div class="row m-t-md">
+  <div class="col-sm-12">
+    <% if (data.error) { %>
+      <label>API call Failed</label>
+      <pre class="bg-danger"><code><%= data.error %></code></pre>
+    <% } %>
+
+    <% if (data.result) { %>
+      <label>API call succeeded</label>
+      <pre class="bg-success"><code><%= data.result %></code></pre>
+    <% } %>
+  </div>
+</div>
+

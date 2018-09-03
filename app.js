@@ -27,7 +27,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/salesforce/account', require('./routes/salesforce/account'));
 app.use('/salesforce/contact', require('./routes/salesforce/contact'));
-app.use('/salesforce', require('./routes/salesforce/auth'));
+app.use('/salesforce/lead', require('./routes/salesforce/lead'));
+app.use('/salesforce/auth', require('./routes/salesforce/auth'));
 app.use('/', require('./routes/index'));
 
 
