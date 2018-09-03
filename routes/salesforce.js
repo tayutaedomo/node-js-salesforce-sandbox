@@ -46,6 +46,84 @@ router.post('/auth', function(req, res, next) {
 });
 
 
+router.get('/contact/query', function(req, res, next) {
+  res.render('salesforce/contact/query', {
+    title: 'Query Contacts',
+    data: { params: {} }
+  });
+});
+
+router.post('/contact/query', function(req, res, next) {
+  const params = req.body;
+  const payload =  {
+    title: 'Query Contacts',
+    data: { params: params }
+  };
+
+  let conn = null;
+
+  Promise.resolve().then(function() {
+    return loginAsync().then(function(result) {
+      debug('loginAsync result', result.result);
+      conn = result.conn;
+    });
+
+  }).then(function() {
+    return new Promise(function(resolve, reject) {
+      //
+      // See: https://jsforce.github.io/document/#using-query-method-chain
+      //
+      let query = conn.sobject('Contact');
+
+      query = query.find(
+        { // Condition
+        },
+        { // Fields
+          Id: 1,
+          Name: 1,
+          Email: 1,
+          CreatedDate: 1
+        }
+      );
+
+      query.limit(10);
+      query.sort({ CreatedDate: -1 });
+
+      query.execute(function(err, result) {
+        debug('conn.sobject Contact.find', result);
+
+        if (err) {
+          console.error(result);
+          reject(err);
+
+        } else {
+          payload.data.result = JSON.stringify(result, null, 2);
+          resolve();
+        }
+      });
+    });
+
+  }).catch(function(err) {
+    console.error(err);
+    payload.data.error = err;
+
+  }).finally(function() {
+    res.render('salesforce/contact/query', payload);
+  });
+});
+
+// router.get('/contact/create', function(req, res, next) {
+//   res.render('salesforce/contact/create', {
+//     title: 'Create Account',
+//     data: { params: {} }
+//   });
+// });
+//
+// router.post('/contact/create', function(req, res, next) {
+//   debug('/contact/create body', req.body);
+// });
+
+
 router.get('/account/query', function(req, res, next) {
   res.render('salesforce/account/query', {
     title: 'Query Accounts',
@@ -70,7 +148,9 @@ router.post('/account/query', function(req, res, next) {
 
   }).then(function() {
     return new Promise(function(resolve, reject) {
+      //
       // See: https://jsforce.github.io/document/#using-soql
+      //
       conn.query("SELECT Id, Name FROM Account", function(err, result) {
         debug('conn.query', result);
 
@@ -119,7 +199,9 @@ router.post('/account/create', function(req, res, next) {
 
   }).then(function() {
     return new Promise(function(resolve, reject) {
+      //
       // See: https://jsforce.github.io/document/#create
+      //
       const p = {
         Name: params.name
       };
@@ -156,7 +238,9 @@ function loginAsync() {
     }
   };
 
+  //
   // See: https://github.com/jsforce/jsforce/issues/1
+  //
   //if (PROXY_URL) options.proxyUrl = PROXY_URL;
   if (HTTP_PROXY) options.httpProxy = HTTP_PROXY;
 
