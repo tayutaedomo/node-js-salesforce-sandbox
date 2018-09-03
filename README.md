@@ -29,6 +29,11 @@ export OAUTH_CLIENT_USERNAME=<Your client username>
 export OAUTH_CLIENT_PASSWORD=<Your client password>
 ```
 
+# Setup Proxy
+```
+export HTTP_PROXY=<http://xxx.xxx.xxx.xxx:3128>
+```
+
 
 # License
 MIT

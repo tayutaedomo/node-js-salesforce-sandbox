@@ -15,6 +15,7 @@ const OAUTH_CONSUMER_KEY    = process.env.OAUTH_CONSUMER_KEY;
 const OAUTH_CONSUMER_SECRET = process.env.OAUTH_CONSUMER_SECRET;
 const OAUTH_CLIENT_USERNAME = process.env.OAUTH_CLIENT_USERNAME;
 const OAUTH_CLIENT_PASSWORD = process.env.OAUTH_CLIENT_PASSWORD;
+const HTTP_PROXY = process.env.HTTP_PROXY;
 
 
 router.get('/auth', function(req, res, next) {
@@ -63,6 +64,7 @@ router.post('/account/query', function(req, res, next) {
 
   Promise.resolve().then(function() {
     return loginAsync().then(function(result) {
+      debug('loginAsync result', result.result);
       conn = result.conn;
     });
 
@@ -70,6 +72,8 @@ router.post('/account/query', function(req, res, next) {
     return new Promise(function(resolve, reject) {
       // See: https://jsforce.github.io/document/#using-soql
       conn.query("SELECT Id, Name FROM Account", function(err, result) {
+        debug('conn.query', result);
+
         if (err) {
           console.error(result);
           reject(err);
@@ -144,6 +148,7 @@ router.post('/account/create', function(req, res, next) {
 
 function loginAsync() {
   const options = {
+    logLevel: 'DEBUG',
     oauth2: {
       loginUrl:     OAUTH_LOGIN_URL,
       clientId:     OAUTH_CONSUMER_KEY,
@@ -151,7 +156,9 @@ function loginAsync() {
     }
   };
 
-  if (process.env.PROXY_URL) options.proxyUrl = process.env.PROXY_URL;
+  // See: https://github.com/jsforce/jsforce/issues/1
+  //if (PROXY_URL) options.proxyUrl = PROXY_URL;
+  if (HTTP_PROXY) options.httpProxy = HTTP_PROXY;
 
   const conn = new jsforce.Connection(options);
 
