@@ -8,9 +8,6 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const basicAuth = require('basic-auth-connect');
 
-const indexRouter = require('./routes/index');
-const salesforceRouter = require('./routes/salesforce');
-
 const app = express();
 
 const basicUsername = process.env.BASIC_USERNAME || 'username';
@@ -28,8 +25,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/salesforce', salesforceRouter);
-app.use('/', indexRouter);
+app.use('/salesforce/account', require('./routes/salesforce/account'));
+app.use('/salesforce/contact', require('./routes/salesforce/contact'));
+app.use('/salesforce', require('./routes/salesforce/auth'));
+app.use('/', require('./routes/index'));
 
 
 // catch 404 and forward to error handler
