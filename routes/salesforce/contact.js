@@ -186,6 +186,57 @@ router.post('/create', function(req, res, next) {
   });
 });
 
+router.get('/upsert', function(req, res, next) {
+  res.render('salesforce/contact/upsert', {
+    title: 'Upsert Contact',
+    data: { params: {} }
+  });
+});
+
+router.post('/upsert', function(req, res, next) {
+  const params = req.body;
+  const payload =  {
+    title: 'Upsert Contact',
+    data: { params: params }
+  };
+
+  let conn = null;
+
+  Promise.resolve().then(function() {
+    return salesforce.loginAsync().then(function(result) {
+      conn = result.conn;
+    });
+
+  }).then(function() {
+    return new Promise(function(resolve, reject) {
+      const obj = {
+        LastName: params.lastName,
+        Email: params.email
+      };
+
+      const ext_id = 'Email';
+
+      conn.sobject('Contact').upsert(obj, ext_id, function(err, result) {
+        if (err || !result.success) {
+          console.error(result);
+          reject(err);
+
+        } else {
+          payload.data.result = JSON.stringify(result, null, 2);
+          resolve();
+        }
+      });
+    });
+
+  }).catch(function(err) {
+    console.error(err);
+    payload.data.error = err;
+
+  }).finally(function() {
+    res.render('salesforce/contact/upsert', payload);
+  });
+});
+
 
 module.exports = router;
 
