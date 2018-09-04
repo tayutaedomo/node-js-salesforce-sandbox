@@ -74,6 +74,67 @@ router.post('/query', function(req, res, next) {
   });
 });
 
+router.get('/find', function(req, res, next) {
+  res.render('salesforce/contact/find', {
+    title: 'Find Contact',
+    data: { params: {} }
+  });
+});
+
+router.post('/find', function(req, res, next) {
+  const params = req.body;
+  const payload =  {
+    title: 'Find Contacts',
+    data: { params: params }
+  };
+
+  let conn = null;
+
+  Promise.resolve().then(function() {
+    return salesforce.loginAsync().then(function(result) {
+      debug('loginAsync result', result.result);
+      conn = result.conn;
+    });
+
+  }).then(function() {
+    return new Promise(function(resolve, reject) {
+      //
+      // See: https://jsforce.github.io/document/#using-query-method-chain
+      //
+      let query = conn.sobject('Contact');
+
+      query = query.find(
+        { // Condition
+          Email: params.email
+        },
+      );
+
+      query.limit(1);
+      query.sort({ CreatedDate: -1 });
+
+      query.execute(function(err, result) {
+        debug('conn.sobject Contact.find', result);
+
+        if (err) {
+          console.error(result);
+          reject(err);
+
+        } else {
+          payload.data.result = JSON.stringify(result, null, 2);
+          resolve();
+        }
+      });
+    });
+
+  }).catch(function(err) {
+    console.error(err);
+    payload.data.error = err;
+
+  }).finally(function() {
+    res.render('salesforce/contact/find', payload);
+  });
+});
+
 router.get('/create', function(req, res, next) {
   res.render('salesforce/contact/create', {
     title: 'Create Contact',
