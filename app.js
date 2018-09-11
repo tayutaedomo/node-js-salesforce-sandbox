@@ -17,18 +17,21 @@ app.use(basicAuth(basicUsername, basicPassword));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(expressLayouts);
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/salesforce/auth', require('./routes/salesforce/auth'));
 app.use('/salesforce/account', require('./routes/salesforce/account'));
 app.use('/salesforce/contact', require('./routes/salesforce/contact'));
 app.use('/salesforce/lead', require('./routes/salesforce/lead'));
-app.use('/salesforce/auth', require('./routes/salesforce/auth'));
+app.use('/salesforce/chatter', require('./routes/salesforce/chatter'));
 app.use('/', require('./routes/index'));
 
 
