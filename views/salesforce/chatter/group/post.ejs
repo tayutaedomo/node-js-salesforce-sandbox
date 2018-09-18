@@ -1,0 +1,37 @@
+
+<h4>Chatter Post to Group</h4>
+
+<div class="row">
+  <div class="col-sm-12">
+    <form action="/salesforce/chatter/group/post" method="POST">
+      <div class="form-group">
+        <label>Group ID:</label>
+        <input type="text" name="groupId" style="width: 200px;"
+               value="<% if (data.params.groupId) { %><%= data.params.groupId %><% } %>">
+      </div>
+
+      <div class="form-group">
+          <label>Message:</label>
+          <input type="text" name="message" style="width: 400px;"
+                 value="<% if (data.params.message) { %><%= data.params.message %><% } %>">
+      </div>
+
+      <button type="submit" class="btn btn-success">Post</button>
+    </form>
+  </div>
+</div>
+
+<div class="row m-t-md">
+  <div class="col-sm-12">
+    <% if (data.error) { %>
+      <label>API call Failed</label>
+      <pre class="bg-danger"><code><%= data.error %></code></pre>
+    <% } %>
+
+    <% if (data.result) { %>
+      <label>API call succeeded</label>
+      <pre class="bg-success"><code><%= data.result %></code></pre>
+    <% } %>
+  </div>
+</div>
+
